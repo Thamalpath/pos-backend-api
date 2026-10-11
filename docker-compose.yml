@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  # Cloud Database (PostgreSQL)
+  postgres:
+    image: postgres:16-alpine
+    container_name: omnipos_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: pos_user
+      POSTGRES_PASSWORD: pos_secure_password
+      POSTGRES_DB: omnipos_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Distributed Cache & Realtime Locks (Redis)
+  redis:
+    image: redis:7-alpine
+    container_name: omnipos_redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+
+  # Optional Web-based Database Management GUI
+  adminer:
+    image: adminer:latest
+    container_name: omnipos_adminer
+    restart: unless-stopped
+    ports:
+      - '8080:8080'
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+  redis_data:
